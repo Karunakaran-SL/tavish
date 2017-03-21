@@ -2,40 +2,58 @@ package com.tavish.voice.reco.core.controller;
 
 import com.tavish.voice.reco.core.model.VoiceResponse;
 import com.tavish.voice.reco.core.service.VoiceService;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.servlet.http.Part;
 
-/**
- * Created by khjg232 on 04/03/2017.
- */
-@RestController("/api/voice")
+@RestController
 public class VoiceController {
 
     @Autowired
     VoiceService voiceService;
 
-    @RequestMapping(method = RequestMethod.POST, headers=("content-type=multipart/*"), produces =
-            MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public @ResponseBody VoiceResponse processCommand(HttpServletResponse response,
-                                                      @RequestParam("file") MultipartFile file){
+    @RequestMapping(value = "/api/voice",method = RequestMethod.POST, produces = MediaType
+            .APPLICATION_OCTET_STREAM_VALUE)
+    public void processCommand(HttpServletResponse response, HttpServletRequest request){
         VoiceResponse voiceResponse = new VoiceResponse();
         try {
-            InputStream inputStream = voiceService.handleCommand(file.getInputStream(),new Voice());
-            response.addHeader("Content-disposition", "attachment;filename=response.mp3");
-            response.setContentType("multipart/mixed");
+            final Part file = request.getPart("file");
+            voiceService.handleCommand(file.getInputStream(),new Voice(), response.getOutputStream());
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + "test.wav" +
+                    "\"");
+            //return ResponseEntity.status(HttpStatus.OK).body(new InputStreamResource
+            // (inputStream));
             // Copy the stream to the response's output stream.
-            IOUtils.copy(inputStream, response.getOutputStream());
-            response.flushBuffer();
-        } catch (IOException e) {
+            //IOUtils.copy(inputStream, response.getOutputStream());
+            //response.flushBuffer();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return voiceResponse;
+    }
+
+    @RequestMapping(value = "/api/direct", method = RequestMethod.POST, produces = MediaType
+            .APPLICATION_OCTET_STREAM_VALUE)
+    public void processDirectCommand(HttpServletResponse response, HttpServletRequest request,
+                                     @RequestParam(value = "command") String command){
+        VoiceResponse voiceResponse = new VoiceResponse();
+        try {
+            voiceService.handleDirectCommand(command,new Voice(), response.getOutputStream());
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + "test.wav" +
+                    "\"");
+            //return ResponseEntity.status(HttpStatus.OK).body(new InputStreamResource
+            // (inputStream));
+            // Copy the stream to the response's output stream.
+            //IOUtils.copy(inputStream, response.getOutputStream());
+            //response.flushBuffer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

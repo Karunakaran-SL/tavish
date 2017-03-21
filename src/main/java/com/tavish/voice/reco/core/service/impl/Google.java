@@ -1,6 +1,5 @@
 package com.tavish.voice.reco.core.service.impl;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.cloud.speech.spi.v1beta1.SpeechClient;
 import com.google.cloud.speech.v1beta1.*;
 import com.google.protobuf.ByteString;
@@ -10,9 +9,6 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.util.List;
 
-/**
- * Created by khjg232 on 04/03/2017.
- */
 @Service
 public class Google {
     public String convert2Text(InputStream inputStream){

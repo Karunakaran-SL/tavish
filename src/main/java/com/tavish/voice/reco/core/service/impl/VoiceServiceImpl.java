@@ -1,22 +1,33 @@
 package com.tavish.voice.reco.core.service.impl;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.tavish.voice.reco.core.controller.Voice;
+import com.tavish.voice.reco.core.service.CommandService;
 import com.tavish.voice.reco.core.service.VoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
-/**
- * Created by khjg232 on 04/03/2017.
- */
 @Service
 public class VoiceServiceImpl implements VoiceService{
     @Autowired
-    Google google;
-    public InputStream handleCommand(InputStream inputStream, Voice voice){
-        google.convert2Text(inputStream);
-        return inputStream;
+    IBM ibm;
+
+    @Autowired
+    CommandService commandService;
+
+    @Autowired
+    DefaultCommandHandler defaultCommandHandler;
+    public void handleCommand(InputStream inputStream, Voice voice, OutputStream outputStream){
+        String converted = ibm.convert2Text(inputStream);
+        System.out.println("=================>"+converted);
+        String response = commandService.handleCommand("admin",converted.trim());
+        defaultCommandHandler.handleCommand(response, outputStream);
+    }
+
+    public void handleDirectCommand(String command, Voice voice, OutputStream outputStream){
+        String response = commandService.handleCommand("admin",command.trim());
+        defaultCommandHandler.handleCommand(response, outputStream);
     }
 }
