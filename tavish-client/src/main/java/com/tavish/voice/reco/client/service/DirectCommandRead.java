@@ -94,16 +94,20 @@ public class DirectCommandRead {
         Scanner scanner = new Scanner(System.in);
         while(true) {
             String command = scanner.nextLine();
-            ResponseEntity<byte[]> responseEntity = new ClientService().invokeByCommand(command);
-            if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
-                //response.setHeader("Content-Disposition", "attachment; filename=\"" +
-                //"testr.wav" + "\"");
-                //IOUtils.write(responseEntity.getBody(), response.getOutputStream());
-                ByteArrayInputStream bis = new ByteArrayInputStream(responseEntity.getBody());
-                AudioFormat audioFormat = new AudioFormat(25050, 16, 2, true, false);
-                AudioInputStream audioInputStream2 = new AudioInputStream(bis, audioFormat,
-                        102400);
-                new AePlayWave(audioInputStream2).start();
+            try {
+                ResponseEntity<byte[]> responseEntity = new ClientService().invokeByCommand(command);
+                if (responseEntity.getStatusCode().equals(HttpStatus.OK)) {
+                    //response.setHeader("Content-Disposition", "attachment; filename=\"" +
+                    //"testr.wav" + "\"");
+                    //IOUtils.write(responseEntity.getBody(), response.getOutputStream());
+                    ByteArrayInputStream bis = new ByteArrayInputStream(responseEntity.getBody());
+                    AudioFormat audioFormat = new AudioFormat(25050, 16, 2, true, false);
+                    AudioInputStream audioInputStream2 = new AudioInputStream(bis, audioFormat,
+                            102400);
+                    new AePlayWave(audioInputStream2).start();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

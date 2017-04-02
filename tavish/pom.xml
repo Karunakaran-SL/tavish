@@ -25,7 +25,7 @@
     </properties>
   
     <modules>
-		<module>tavish-ui</module>
+		<!--<module>tavish-ui</module>-->
 		<module>tavish-sdk</module>
 		<module>tavish-services</module>
 	</modules>
